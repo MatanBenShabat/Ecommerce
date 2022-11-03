@@ -22,7 +22,8 @@ const server = app.listen(port, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    // origin: "http://localhost:3000",
+    origin: "https://rich-gray-bandicoot-slip.cyclic.app",
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   },
 });
