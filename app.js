@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === "development") {
 
 // Limit requests from same API
 const limiter = rateLimit({
-  max: 100,
+  max: 1000,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP, please try again in an hour.",
 });
@@ -51,7 +51,7 @@ app.use(
 );
 
 // app.use(cors({credentials: true, origin: process.env.NODE_ENV === 'development'?'http://localhost:3000':process.env.SITE_URL}));
-app.use(cors({credentials: true, origin: process.env.NODE_ENV === 'development'?'https://rich-gray-bandicoot-slip.cyclic.app/':process.env.SITE_URL}));
+app.use(cors({credentials: true, origin: process.env.NODE_ENV === 'development'?'https://rich-gray-bandicoot-slip.cyclic.app':process.env.SITE_URL}));
 
 
 app.use(cookieParser());
