@@ -51,7 +51,6 @@ app.use(
 );
 
 app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
-// app.use(cors({credentials: true, origin: 'https://rich-gray-bandicoot-slip.cyclic.app'}));
 // app.use(cors({credentials: true, origin: process.env.NODE_ENV === 'development'?'https://rich-gray-bandicoot-slip.cyclic.app':process.env.SITE_URL}));
 
 
