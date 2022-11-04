@@ -12,7 +12,7 @@ process.on("uncaughtException", (err) => {
 
 mongoose
   .connect(process.env.DB, { useNewUrlParser: true })
-  .then(() => console.log("Conected to database"));
+  .then(() => console.log("Connected to database"));
 // .catch((err) => console.log(err));
 
 const port = process.env.PORT || 5000;
@@ -22,8 +22,8 @@ const server = app.listen(port, () => {
 
 const io = new Server(server, {
   cors: {
-    // origin: "http://localhost:3000",
-    origin: "https://house-of--auctions.herokuapp.com",
+    origin: "http://localhost:3000",
+    // origin: "https://house-of--auctions.herokuapp.com",
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   },
 });
