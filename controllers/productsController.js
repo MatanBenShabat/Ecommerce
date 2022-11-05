@@ -10,17 +10,22 @@ exports.aliasTopProducts = (req, res, next) => {
   req.query.fields = "productsName,price,image";
   next();
 };
+
 exports.getProducts = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(Products.find(), req.query)
+  // const filteredProducts = new APIFeatures(Products.find(), req.query).filter();
+  const [features, count] = new APIFeatures(Products.find(), req.query)
     .filter()
+    .count()
     .sort()
     .limitFields()
-    .paginate();
-    
-  const products = await features.query;
+    .paginate()
+    .getQueries();
+
+  const [products, length] = await Promise.all([features, count]);
+
   res.status(200).json({
     status: "success",
-    results: products.length,
+    length,
     data: {
       products,
     },
@@ -122,8 +127,11 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
       status: "success",
     });
 
-  if(!checkUsername) {
-    return next(new AppError("You do not have permission to delete this product", 401))};
+  if (!checkUsername) {
+    return next(
+      new AppError("You do not have permission to delete this product", 401)
+    );
+  }
 });
 
 exports.getProductsStats = catchAsync(async (req, res, next) => {
@@ -146,11 +154,23 @@ exports.getProductsStats = catchAsync(async (req, res, next) => {
       $sort: { avgPrice: 1 },
     },
   ]);
+  
   res.status(200).json({
     status: "success",
     results: stats.length,
     data: {
       stats,
+    },
+  });
+});
+
+exports.getNameAndBrand = catchAsync(async (req, res, next) => {
+  const nameAndBrand = await Products.find().select("brand productsName");
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      ...nameAndBrand
     },
   });
 });

@@ -6,11 +6,12 @@ const router = express.Router();
 
 router
   .get(
-    "/top-5-cheap",
+    "/top-5-cheap",authController.protect,
     productsController.aliasTopProducts,
     productsController.getProducts
   )
-  .get("/products-stats", productsController.getProductsStats);
+  .get("/products-stats",authController.protect, productsController.getProductsStats)
+  .get("/name-and-brand",authController.protect, productsController.getNameAndBrand);
 
 router
   .get("/products", authController.protect, productsController.getProducts)
