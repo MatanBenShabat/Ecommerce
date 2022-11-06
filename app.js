@@ -50,17 +50,17 @@ app.use(
 );
 
 // app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
-app.use(cors({credentials: true}));
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Methods", "*");
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept,Authorization,token,origin"
-  );
+app.use(cors({credentials: true, origin: 'https://beautiful-granita-25fbb1.netlify.app'}));
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Methods", "*");
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept,Authorization,token,origin"
+//   );
 
-  next();
-});
+//   next();
+// });
 // app.use(cors({credentials: true, origin: process.env.NODE_ENV === 'development'?'https://rich-gray-bandicoot-slip.cyclic.app':process.env.SITE_URL}));
 
 app.use(cookieParser());
