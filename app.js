@@ -13,7 +13,6 @@ const usersRoutes = require("./routes/api-users");
 const productsRoutes = require("./routes/api-products");
 const handle404 = require("./middlewares/handle404");
 const cors = require("cors");
-require('dotenv').config({ path: '.env' });
 
 const app = express();
 
@@ -56,6 +55,7 @@ app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
 
 
 app.use(cookieParser());
+
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
 

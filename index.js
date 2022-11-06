@@ -21,8 +21,8 @@ const server = app.listen(port, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    // origin: "https://house-of--auctions.herokuapp.com",
+    // origin: "http://localhost:3000",
+    origin: "https://house-of--auctions.herokuapp.com",
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   },
 });
