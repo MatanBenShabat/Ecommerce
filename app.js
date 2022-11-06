@@ -51,7 +51,7 @@ app.use(
 );
 
 // app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
-app.use(cors({credentials: true, origin: 'https://beautiful-granita-25fbb1.netlify.app'}));
+app.use(cors({credentials: true, origin: 'https://beautiful-granita-25fbb1.netlify.app/'}));
 // app.use(cors({credentials: true, origin: process.env.NODE_ENV === 'development'?'https://rich-gray-bandicoot-slip.cyclic.app':process.env.SITE_URL}));
 
 
