@@ -50,7 +50,7 @@ app.use(
 );
 
 // app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
-app.use(cors({credentials: true, origin: 'https://beautiful-granita-25fbb1.netlify.app'}));
+app.use(cors({credentials: true, origin: 'https://house-of-auctions.netlify.app/'}));
 // app.use((req, res, next) => {
 //   res.header("Access-Control-Allow-Methods", "*");
 //   res.header("Access-Control-Allow-Origin", "*");
