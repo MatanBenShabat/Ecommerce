@@ -21,8 +21,7 @@ const server = app.listen(port, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "https://house-of-auctions.netlify.app",
-    // origin: "https://house-of--auctions.herokuapp.com",
+    origin: `${process.env.SITE_URL}`,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
   },
 });
