@@ -21,7 +21,12 @@ exports.getProducts = catchAsync(async (req, res, next) => {
     .paginate()
     .getQueries();
 
-  const [products, length] = await Promise.all([features, count]);
+  const [allProducts, length] = await Promise.all([features, count])
+  let products = [] 
+  allProducts.forEach(item => {
+    if(item.isActive === false && item.seller === req.user.username) products.push(item)
+    if(item.isActive === true) products.push(item)
+  });
 
   res.status(200).json({
     status: "success",
@@ -76,6 +81,26 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.updateRating = catchAsync(async (req, res, next) => {
+  updatedProduct = await Products.findByIdAndUpdate(req.params.id, {rating: req.body.rating}, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedProduct) {
+    return next(new AppError("No product found with that ID", 404));
+  }
+
+  res.status(200).json({
+    status: "success"
+    // data: {
+    //   product: updatedProduct,
+    // },
+  });
+});
+
+
 exports.updateBid = catchAsync(async (req, res, next) => {
   newBid = req.body.currentBid;
   if (!newBid) return next(new AppError("Please place bid!", 400));
@@ -116,8 +141,6 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   }
 
   const checkUsername = await product.allowDeletion(req.user.username);
-  // .save({ validateModifiedOnly: true });
-  console.log(checkUsername);
   checkUsername && AuctionTimers.cancleTimer(product._id);
 
   checkUsername && (await Products.findByIdAndDelete(req.params.id));
@@ -165,8 +188,12 @@ exports.getProductsStats = catchAsync(async (req, res, next) => {
 });
 
 exports.getNameAndBrand = catchAsync(async (req, res, next) => {
-  const nameAndBrand = await Products.find().select("brand productsName");
-
+  const allNameAndBrand = await Products.find().select("brand productsName isActive seller");
+  let nameAndBrand = []
+  allNameAndBrand.forEach(item => {
+    if(item.isActive === false && item.seller === req.user.username) nameAndBrand.push(item)
+    if(item.isActive === true) nameAndBrand.push(item)
+  });
   res.status(200).json({
     status: "success",
     data: {

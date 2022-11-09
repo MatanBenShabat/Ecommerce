@@ -23,9 +23,14 @@ router
     productsController.createProduct
   )
   .patch(
-    "/products/:id",
+    "/products-bid/:id",
     authController.protect,
     productsController.updateBid
+  )
+  .patch(
+    "/products-rate/:id",
+    authController.protect,
+    productsController.updateRating
   )
   .delete(
     "/products/?:id",

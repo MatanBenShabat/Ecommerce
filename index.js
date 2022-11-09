@@ -36,6 +36,9 @@ io.on("connection", (socket) => {
   socket.on("delete_product", () => {
     socket.broadcast.emit("product_added");
   });
+  socket.on("rate_product", () => {
+    socket.broadcast.emit("product_added");
+  });
 
   // AuctionTimers.socket = socket;
 });
