@@ -11,6 +11,16 @@ exports.aliasTopProducts = (req, res, next) => {
   next();
 };
 
+exports.getHomePageProducts = catchAsync(async (req,res) => {
+  const products = await Products.find().limit(3).select("productsName image price currentBid createDate endOfAuction")
+  res.status(200).json({
+    status: "success",
+    data:{
+      products
+    }
+  })
+})
+
 exports.getProducts = catchAsync(async (req, res, next) => {
   // const filteredProducts = new APIFeatures(Products.find(), req.query).filter();
   const [features, count] = new APIFeatures(Products.find(), req.query)

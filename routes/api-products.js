@@ -11,7 +11,8 @@ router
     productsController.getProducts
   )
   .get("/products-stats",authController.protect, productsController.getProductsStats)
-  .get("/name-and-brand",authController.protect, productsController.getNameAndBrand);
+  .get("/name-and-brand",authController.protect, productsController.getNameAndBrand)
+  .get("/home-page-products",productsController.getHomePageProducts)
 
 router
   .get("/products", authController.protect, productsController.getProducts)
