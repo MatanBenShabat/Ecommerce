@@ -23,7 +23,7 @@ const createSendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
     sameSite: "None",
-    // secure: true
+    secure: true
   };
   if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
   res.cookie("jwt", token, cookieOptions);
@@ -51,7 +51,7 @@ exports.logout = (req, res, next) => {
     expires: new Date(Date.now()),
     httpOnly: true,
     sameSite: "None",
-    // secure: true
+    secure: true
   };
   if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
   res.cookie("jwt", null, cookieOptions);
