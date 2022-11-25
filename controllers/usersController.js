@@ -13,8 +13,34 @@ exports.getUsers = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.updateRole = catchAsync(async (req, res, next) => {
+  const types = (type) => {
+    return ["seller", "customer"].includes(type);
+  };
 
-exports.upadateMe = catchAsync(async (req, res, next) => {
+  if (!req.body.userType) {
+    return next(new AppError("Empty field. Please enter a correct type.", 400));
+  }
+
+  if(req.body.userType === req.user.userType){
+    return next(new AppError(`You are already ${req.user.userType}! Please pick another role.`, 400));
+  }
+
+  if (!types(req.body.userType)) {
+    return next(new AppError("Incorrect userType", 400));
+  }
+
+  await Users.findOneAndUpdate(
+    { email: req.user.email },
+    { userType: req.body.userType }
+  );
+
+  res.status(200).json({
+    status: "success",
+  });
+});
+
+exports.updateMe = catchAsync(async (req, res, next) => {
   // 1) Create error if user POSts password data
   if (req.body.password || req.body.paswordConfirm) {
     return next(
@@ -31,7 +57,6 @@ exports.upadateMe = catchAsync(async (req, res, next) => {
   // const filteredBody = filterObj(req.body, "username", "email")
 
   // 3) Upload users document
-
   const user = Object.assign(
     req.user,
     JSON.parse(JSON.stringify({ name, email, photo }))

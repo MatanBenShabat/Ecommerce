@@ -1,3 +1,4 @@
+const { findById } = require("../models/productsModel");
 const Product = require("../models/productsModel");
 
 class AuctionTimersClass {
@@ -41,6 +42,8 @@ class AuctionTimersClass {
 
   async emitTimerEnded(id) {
     await Product.findByIdAndUpdate(id, { isActive: false });
+    // const productBidder = findById(id)?.currentBidder;
+    // await Product.findByIdAndUpdate(id,{winner: productBidder})
     this.io.sockets.emit("product_added");
     this.cancleTimer(id);
   }

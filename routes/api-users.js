@@ -24,7 +24,8 @@ router
   );
 
 router
-  .patch("/updateMe", authController.protect, usersController.upadateMe)
+  .patch("/updateMe", authController.protect, usersController.updateMe)
+  .patch("/updateRole", authController.protect, usersController.updateRole)
   .delete("/deleteMe", authController.protect, usersController.deleteMe)
 
   .get("/users", usersController.getUsers) //Development
