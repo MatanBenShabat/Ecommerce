@@ -1,5 +1,5 @@
 # Ecommerce
-Still in development, clinent side code:
+Still in development, client side code:
 https://github.com/MatanBenShabat/Ecommerce-Client
 
 User types:
