@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 const globalErrorHandler = require("./controllers/errorController");
 const usersRoutes = require("./routes/api-users");
 const productsRoutes = require("./routes/api-products");
+const reviewRoutes = require("./routes/api-reviews");
 const handle404 = require("./middlewares/handle404");
 const cors = require("cors");
 
@@ -66,6 +67,7 @@ app.use((req, res, next) => {
 
 app.use("/api-users", usersRoutes);
 app.use("/api-products", productsRoutes);
+app.use("/api-review", reviewRoutes);
 
 app.all("*", handle404);
 

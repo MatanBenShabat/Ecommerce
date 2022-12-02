@@ -64,6 +64,14 @@ ProductsScheme.virtual("priceInShekels").get(function () {
 //   next();
 // });
 
+
+//Virtual populate
+ProductsScheme.virtual("reviews", {
+  ref:"Review",
+  foreignField: "product",
+  localField:"_id"
+})
+
 ProductsScheme.pre("aggregate", function (next) {
   this.pipeline().unshift({ $match: { isActive: { $ne: false } } });
   next();
