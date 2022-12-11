@@ -34,9 +34,16 @@ exports.updateRole = catchAsync(async (req, res, next) => {
     { email: req.user.email },
     { userType: req.body.userType }
   );
+  const user = await Users.findOne({ email: req.user.email }).select("userType username")
 
   res.status(200).json({
     status: "success",
+    data: {
+      user:{
+        username: user.username,
+        userType: user.userType
+      }
+    }
   });
 });
 
@@ -79,39 +86,39 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createUser = (req, res, next) => {
-  if (!req.body) res.json({ error: "invalid input" });
+// exports.createUser = (req, res, next) => {
+//   if (!req.body) res.json({ error: "invalid input" });
 
-  Users.create(req.user)
-    .then(() =>
-      res.status(201).json({
-        error: false,
-        message: "user registered successfully",
-      })
-    )
-    .catch((err) => {
-      res.json({
-        error: true,
-        message: "couldn't register user",
-      });
-    });
-};
+//   Users.create(req.user)
+//     .then(() =>
+//       res.status(201).json({
+//         error: false,
+//         message: "user registered successfully",
+//       })
+//     )
+//     .catch((err) => {
+//       res.json({
+//         error: true,
+//         message: "couldn't register user",
+//       });
+//     });
+// };
 
-exports.login = (req, res, next) => {
-  Users.findOne({ username: req.body.username })
+// exports.login = (req, res, next) => {
+//   Users.findOne({ username: req.body.username })
 
-    .then((user) => {
-      if (!authorize(req, user)) {
-        res.status(401).json({
-          status: "error",
-          message: "password is incorrect",
-        });
-      } else {
-        res.status(200).json({ status: "success", data: { user } });
-      }
-    })
-    .catch(next);
-};
+//     .then((user) => {
+//       if (!authorize(req, user)) {
+//         res.status(401).json({
+//           status: "error",
+//           message: "password is incorrect",
+//         });
+//       } else {
+//         res.status(200).json({ status: "success", data: { user } });
+//       }
+//     })
+//     .catch(next);
+// };
 
 exports.deleteUser = (req, res, next) => {
   Users.findOneAndDelete({ _id: req.params.id })
