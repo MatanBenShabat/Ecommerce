@@ -11,15 +11,17 @@ exports.aliasTopProducts = (req, res, next) => {
   next();
 };
 
-exports.getHomePageProducts = catchAsync(async (req,res) => {
-  const products = await Products.find().limit(3).select("productsName image price currentBid createDate endOfAuction")
+exports.getHomePageProducts = catchAsync(async (req, res) => {
+  const products = await Products.find()
+    .limit(3)
+    .select("productsName image price currentBid createDate endOfAuction");
   res.status(200).json({
     status: "success",
-    data:{
-      products
-    }
-  })
-})
+    data: {
+      products,
+    },
+  });
+});
 
 exports.getProducts = catchAsync(async (req, res, next) => {
   // const filteredProducts = new APIFeatures(Products.find(), req.query).filter();
@@ -31,11 +33,12 @@ exports.getProducts = catchAsync(async (req, res, next) => {
     .paginate()
     .getQueries();
 
-  const [allProducts, length] = await Promise.all([features, count])
-  let products = [] 
-  allProducts.forEach(item => {
-    if(item.isActive === false && item.seller === req.user.username) products.push(item)
-    if(item.isActive === true) products.push(item)
+  const [allProducts, length] = await Promise.all([features, count]);
+  let products = [];
+  allProducts.forEach((item) => {
+    if (item.isActive === false && item.seller === req.user.username)
+      products.push(item);
+    if (item.isActive === true) products.push(item);
   });
 
   res.status(200).json({
@@ -48,10 +51,13 @@ exports.getProducts = catchAsync(async (req, res, next) => {
 });
 
 exports.getProduct = catchAsync(async (req, res, next) => {
-  const product = await Products.findById(req.params.id).populate("reviews");
-  if (!product) {
-    return next(new AppError("No product found with that ID", 404));
-  }
+  const product = await Products.findById(req.params.id, (err) => {
+    if (err) {
+      return next(new AppError("No product found with that ID", 404));
+    }
+  })
+    .populate("reviews")
+    .clone();
 
   res.status(200).json({
     status: "success",
@@ -93,30 +99,34 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
 });
 
 exports.updateRating = catchAsync(async (req, res, next) => {
-  updatedProduct = await Products.findByIdAndUpdate(req.params.id, {rating: req.body.rating}, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!updatedProduct) {
-    return next(new AppError("No product found with that ID", 404));
-  }
+  updatedProduct = await Products.findByIdAndUpdate(
+    req.params.id,
+    { rating: req.body.rating },
+    {
+      new: true,
+      runValidators: true,
+    },
+    (err) => {
+      if (err) {
+        return next(new AppError("No product found with that ID", 404));
+      }
+    }
+  ).clone();
 
   res.status(200).json({
-    status: "success"
-    // data: {
-    //   product: updatedProduct,
-    // },
+    status: "success",
   });
 });
-
 
 exports.updateBid = catchAsync(async (req, res, next) => {
   newBid = req.body.currentBid;
   if (!newBid) return next(new AppError("Please place bid!", 400));
 
-  const product = await Products.findById(req.params.id);
-  if (!product) return next(new AppError("No product found with that ID", 404));
+  const product = await Products.findById(req.params.id, (err) => {
+    if (err) {
+      return next(new AppError("No product found with that ID", 404));
+    }
+  }).clone();
 
   const isHigher = product.bidValidation(newBid);
 
@@ -131,10 +141,6 @@ exports.updateBid = catchAsync(async (req, res, next) => {
       runValidators: true,
     });
   }
-
-  if (!updatedProduct) {
-    return next(new AppError("No product found with that ID", 404));
-  }
   res.status(200).json({
     status: "success",
     data: {
@@ -144,11 +150,11 @@ exports.updateBid = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteProduct = catchAsync(async (req, res, next) => {
-  const product = await Products.findById(req.params.id);
-
-  if (!product) {
-    return next(new AppError("No product found with that ID", 404));
-  }
+  const product = await Products.findById(req.params.id, (err) => {
+    if (err) {
+      return next(new AppError("No product found with that ID", 404));
+    }
+  }).clone();
 
   const checkUsername = await product.allowDeletion(req.user.username);
   checkUsername && AuctionTimers.cancleTimer(product._id);
@@ -187,7 +193,7 @@ exports.getProductsStats = catchAsync(async (req, res, next) => {
       $sort: { avgPrice: 1 },
     },
   ]);
-  
+
   res.status(200).json({
     status: "success",
     results: stats.length,
@@ -198,16 +204,19 @@ exports.getProductsStats = catchAsync(async (req, res, next) => {
 });
 
 exports.getNameAndBrand = catchAsync(async (req, res, next) => {
-  const allNameAndBrand = await Products.find().select("brand productsName isActive seller");
-  let nameAndBrand = []
-  allNameAndBrand.forEach(item => {
-    if(item.isActive === false && item.seller === req.user.username) nameAndBrand.push(item)
-    if(item.isActive === true) nameAndBrand.push(item)
+  const allNameAndBrand = await Products.find().select(
+    "brand productsName isActive seller"
+  );
+  let nameAndBrand = [];
+  allNameAndBrand.forEach((item) => {
+    if (item.isActive === false && item.seller === req.user.username)
+      nameAndBrand.push(item);
+    if (item.isActive === true) nameAndBrand.push(item);
   });
   res.status(200).json({
     status: "success",
     data: {
-      ...nameAndBrand
+      ...nameAndBrand,
     },
   });
 });
