@@ -3,6 +3,7 @@ const APIFeatures = require("../Utils/apiFeatures");
 const AppError = require("../Utils/appError");
 const AuctionTimers = require("../Utils/AuctionTimers");
 const catchAsync = require("../Utils/catchAsync");
+const factory = require("./factoryHandler");
 
 exports.aliasTopProducts = (req, res, next) => {
   req.query.limit = "5";
@@ -80,26 +81,57 @@ exports.createProduct = catchAsync(async (req, res, next) => {
   });
 });
 
+// exports.updateProduct = (req, res, next) => {
+//   if (Products.all(req.user.username)) {
+//     factory.updateOne(Products);
+//   } else {
+//     return next(
+//       new AppError("You do not have permission to update this product", 401)
+//     );
+//   }
+// };
+
 exports.updateProduct = catchAsync(async (req, res, next) => {
-  updatedProduct = await Products.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  console.log("here");
+  const product = await Products.findById(req.params.id, (err) => {
+    if (err) {
+      return next(new AppError("No product found with that ID", 404));
+    }
+  }).clone();
 
-  if (!updatedProduct) {
-    return next(new AppError("No product found with that ID", 404));
+  if (
+    req.body.winner ||
+    req.body.currentBidder ||
+    req.body.endOfAuctionDate ||
+    req.body.createDate ||
+    req.body._id
+  )
+    return next(
+      new AppError("You do not have permission to perform this action", 401)
+    );
+
+  const checkUsername = await product.allowDeletion(req.user.username);
+
+  checkUsername &&
+    (await Products.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).clone());
+
+  checkUsername &&
+    res.status(200).json({
+      status: "success",
+    });
+
+  if (!checkUsername) {
+    return next(
+      new AppError("You do not have permission to update this product", 401)
+    );
   }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      product: updatedProduct,
-    },
-  });
 });
 
 exports.updateRating = catchAsync(async (req, res, next) => {
-  updatedProduct = await Products.findByIdAndUpdate(
+  await Products.findByIdAndUpdate(
     req.params.id,
     { rating: req.body.rating },
     {

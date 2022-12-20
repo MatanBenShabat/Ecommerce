@@ -4,7 +4,7 @@ const authController = require("../controllers/authController");
 const reviewRoutes = require("../routes/api-reviews");
 const router = express.Router();
 
-router.use("/:productId/reviews", reviewRoutes)
+router.use("/:productId/reviews", reviewRoutes);
 
 router
   .get(
@@ -43,6 +43,12 @@ router
     "/products-rate/:id",
     authController.protect,
     productsController.updateRating
+  )
+  .patch(
+    "/update-product/:id",
+    authController.protect,
+    authController.restrictTo("seller"),
+    productsController.updateProduct
   )
   .delete(
     "/products/?:id",

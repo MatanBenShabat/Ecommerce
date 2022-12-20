@@ -46,5 +46,16 @@ ReviewScheme.pre(/^find/, function(next) {
   next()
 })
 
+ReviewScheme.methods.allowDeletion = function (candidateUserId,next) {
+  
+  const userId = this.user._id.toHexString();
+
+  if (candidateUserId === userId) {
+  return true;
+  }else{
+    return false
+  }
+};
+
 const Review = mongoose.model("Review", ReviewScheme);
 module.exports = Review;

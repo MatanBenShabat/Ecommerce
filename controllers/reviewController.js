@@ -1,5 +1,8 @@
 const Review = require("../models/reviewModel");
+const AppError = require("../Utils/appError");
+const AuctionTimers = require("../Utils/AuctionTimers");
 const catchAsync = require("../Utils/catchAsync");
+const factory = require("./factoryHandler")
 
 exports.getAllReviews = catchAsync(async (req, res) => {
   let filter = {};
@@ -29,3 +32,29 @@ exports.createReview = catchAsync(async (req, res) => {
     },
   });
 });
+
+exports.deleteReview = catchAsync(async (req, res, next) => {
+  const review = await Review.findById(req.params.id, (err) => {
+    if (err) {
+      return next(new AppError("No review found with that ID", 404));
+    }
+  }).clone();
+
+  const checkUsername = await review.allowDeletion(req.user._id.toHexString());
+
+  checkUsername && (await Review.findByIdAndDelete(req.params.id));
+
+  checkUsername &&
+    res.status(204).json({
+      status: "success",
+    });
+
+
+  if (!checkUsername) {
+    return next(
+      new AppError("You do not have permission to delete this review", 401)
+    );
+  }
+});
+
+
