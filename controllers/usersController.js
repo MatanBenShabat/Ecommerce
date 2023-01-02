@@ -3,6 +3,14 @@ const AppError = require("../Utils/appError");
 const authorize = require("../Utils/authorize");
 const catchAsync = require("../Utils/catchAsync");
 
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach(el => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
+
 exports.getUsers = catchAsync(async (req, res, next) => {
   const users = await Users.find({});
   res.status(200).json({
@@ -48,32 +56,30 @@ exports.updateRole = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // 1) Create error if user POSts password data
-  if (req.body.password || req.body.paswordConfirm) {
+  // 1) Create error if user POSTs password data
+  if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        "This route is not for password updates. Please use /updateMyPassword.",
+        'This route is not for password updates. Please use /updateMyPassword.',
         400
       )
     );
   }
 
-  const { name, email, photo } = req.body;
   // 2) Filtered out unwanted fields names that are not allowed to be updated
+  const filteredBody = filterObj(req.body, 'name', 'email');
 
-  // const filteredBody = filterObj(req.body, "username", "email")
-
-  // 3) Upload users document
-  const user = Object.assign(
-    req.user,
-    JSON.parse(JSON.stringify({ name, email, photo }))
-  );
+  // 3) Update user document
+  const updatedUser = await Users.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true
+  });
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
-      user,
-    },
+      user: updatedUser
+    }
   });
 });
 
@@ -85,40 +91,6 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
-
-// exports.createUser = (req, res, next) => {
-//   if (!req.body) res.json({ error: "invalid input" });
-
-//   Users.create(req.user)
-//     .then(() =>
-//       res.status(201).json({
-//         error: false,
-//         message: "user registered successfully",
-//       })
-//     )
-//     .catch((err) => {
-//       res.json({
-//         error: true,
-//         message: "couldn't register user",
-//       });
-//     });
-// };
-
-// exports.login = (req, res, next) => {
-//   Users.findOne({ username: req.body.username })
-
-//     .then((user) => {
-//       if (!authorize(req, user)) {
-//         res.status(401).json({
-//           status: "error",
-//           message: "password is incorrect",
-//         });
-//       } else {
-//         res.status(200).json({ status: "success", data: { user } });
-//       }
-//     })
-//     .catch(next);
-// };
 
 exports.deleteUser = (req, res, next) => {
   Users.findOneAndDelete({ _id: req.params.id })

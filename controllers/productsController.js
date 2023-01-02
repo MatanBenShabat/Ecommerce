@@ -3,7 +3,6 @@ const APIFeatures = require("../Utils/apiFeatures");
 const AppError = require("../Utils/appError");
 const AuctionTimers = require("../Utils/AuctionTimers");
 const catchAsync = require("../Utils/catchAsync");
-const factory = require("./factoryHandler");
 
 exports.aliasTopProducts = (req, res, next) => {
   req.query.limit = "5";
@@ -81,15 +80,7 @@ exports.createProduct = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.updateProduct = (req, res, next) => {
-//   if (Products.all(req.user.username)) {
-//     factory.updateOne(Products);
-//   } else {
-//     return next(
-//       new AppError("You do not have permission to update this product", 401)
-//     );
-//   }
-// };
+
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   console.log("here");

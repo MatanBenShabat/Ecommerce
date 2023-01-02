@@ -2,7 +2,6 @@ const Review = require("../models/reviewModel");
 const AppError = require("../Utils/appError");
 const AuctionTimers = require("../Utils/AuctionTimers");
 const catchAsync = require("../Utils/catchAsync");
-const factory = require("./factoryHandler")
 
 exports.getAllReviews = catchAsync(async (req, res) => {
   let filter = {};

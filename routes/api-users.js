@@ -13,22 +13,29 @@ router
   .post("/login", 
   SignInValidation, 
   authController.login)
-  .post("/startApp", authController.protect, authController.startApp)
-  .post("/logout", authController.protect, authController.logout)
   .post("/forgotPassword", authController.forgotPassword)
   .patch("/resetPassword/:token", authController.resetPassword)
+  
+
+  router.use(authController.protect)
+  
+  
+  router
+  .post("/startApp", authController.startApp)
+
+  .post("/logout", authController.logout)
+
   .patch(
-    "/updateMyPassword",
-    authController.protect,
-    authController.updatePassword
-  );
+  "/updateMyPassword",
+ 
+  authController.updatePassword
+    )
 
-router
-  .patch("/updateMe", authController.protect, usersController.updateMe)
-  .patch("/updateRole", authController.protect, usersController.updateRole)
-  .delete("/deleteMe", authController.protect, usersController.deleteMe)
+  .patch("/updateMe", usersController.updateMe)
+  .patch("/updateRole", usersController.updateRole)
+  .delete("/deleteMe", usersController.deleteMe)
 
-  .get("/users", usersController.getUsers) //Development
+  .get("/users",authController.restrictTo("admin"), usersController.getUsers) //Development
   .delete(
     "/users/?:id",
     authController.restrictTo("admin"),
