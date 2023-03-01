@@ -29,6 +29,10 @@ const ProductsScheme = mongoose.Schema(
       max: [5, "Rating must be below 5"],
       min: [1, "Rating must be above 5"],
     },
+    ratingsQuantity:{
+      type: Number,
+      default: 0
+    },
     description: {
       type: String,
       required: [true, "A product must have a description"],
@@ -53,6 +57,8 @@ const ProductsScheme = mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+ProductsScheme.index({price: 1,avgRating: -1})
 
 ProductsScheme.virtual("priceInShekels").get(function () {
   return this.price * 3.14;

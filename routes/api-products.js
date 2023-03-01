@@ -8,6 +8,7 @@ router.use("/:productId/reviews", reviewRoutes);
 
 router.get("/home-page-products", productsController.getHomePageProducts);
 
+router.get("/updateProductsIsActiveAndExpiredDate", productsController.updateProductsIsActiveAndExpiredDate)
 router.use(authController.protect);
 
 router

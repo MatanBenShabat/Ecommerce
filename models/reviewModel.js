@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Products = require("./productsModel");
 
 const ReviewScheme = mongoose.Schema(
   {
@@ -33,29 +34,52 @@ const ReviewScheme = mongoose.Schema(
   }
 );
 
-ReviewScheme.pre(/^find/, function(next) {
+ReviewScheme.pre(/^find/, function (next) {
   this.populate({
     path: "user",
-    select: "image username"
-  })
+    select: "image username",
+  });
   // this.populate({
   //   path: "product",
   //   select:"productsName"
   // })
 
-  next()
-})
+  next();
+});
 
-ReviewScheme.methods.allowDeletion = function (candidateUserId,next) {
-  
+ReviewScheme.methods.allowDeletion = function (candidateUserId, next) {
   const userId = this.user._id.toHexString();
 
   if (candidateUserId === userId) {
-  return true;
-  }else{
-    return false
+    return true;
+  } else {
+    return false;
   }
 };
+
+ReviewScheme.statics.calcAverageRatings = async function (productId) {
+  const stats = await this.aggregate([
+    { $match: { product: productId } },
+    {
+      $group: {
+        _id: "$product",
+        numRatings: { $sum: 1 },
+        avgRating: { $avg: "$rating" },
+      },
+    },
+  ]);
+  // console.log(stats);
+  await Products.findByIdAndUpdate(productId,{
+    ratingsQuantity: stats[0].numRatings,
+    rating: stats[0].avgRating
+  })
+};
+
+ReviewScheme.post("save", function () {
+  //this points to current review
+
+  this.constructor.calcAverageRatings(this.product);
+});
 
 const Review = mongoose.model("Review", ReviewScheme);
 module.exports = Review;

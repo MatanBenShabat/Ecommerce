@@ -205,7 +205,8 @@ exports.getProductsStats = catchAsync(async (req, res, next) => {
       $group: {
         _id: { $toUpper: "$brand" },
         numProducts: { $sum: 1 },
-        avgRating: { $avg: "$rating" },
+        avgRatings: { $avg: "$rating" },
+        numRatings: { $sum: "$quantityRatings" },
         avgPrice: { $avg: "$price" },
         minPrice: { $min: "$price" },
         maxPrice: { $max: "$price" },
@@ -243,3 +244,9 @@ exports.getNameAndBrand = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.updateProductsIsActiveAndExpiredDate = catchAsync(async (req,res,next) => {
+  await Products.updateMany({isActive: true})
+  await Products.updateMany({endOfAuctionDate: Date.now()+5*24*60*60*1000})
+  next()
+})
