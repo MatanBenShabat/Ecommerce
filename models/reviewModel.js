@@ -68,17 +68,37 @@ ReviewScheme.statics.calcAverageRatings = async function (productId) {
       },
     },
   ]);
-  // console.log(stats);
-  await Products.findByIdAndUpdate(productId,{
-    ratingsQuantity: stats[0].numRatings,
-    rating: stats[0].avgRating
-  })
+
+  if (stats.length > 0) {
+    await Products.findByIdAndUpdate(productId, {
+      ratingsQuantity: stats[0].numRatings,
+      rating: stats[0].avgRating,
+    });
+  }else{
+    await Products.findByIdAndUpdate(productId, {
+      ratingsQuantity: 0,
+      rating: 5,
+    });
+  }
 };
 
 ReviewScheme.post("save", function () {
   //this points to current review
 
   this.constructor.calcAverageRatings(this.product);
+});
+
+// in findOneAnd we do not have access to the doc by using "this", thats why we do the following:
+
+ReviewScheme.pre(/^findOneAnd/, async function (next) {
+  //getting access to doc and saving it in the doc as thisReview so we can get access to the updated doc in the post findOne middaleware
+  this.thisReview = await this.findOne();
+  next();
+});
+
+ReviewScheme.post(/^findOneAnd/, async function () {
+  // await this.findOne() does NOT work here, query has already executed
+  await this.thisReview.constructor.calcAverageRatings(this.thisReview.product);
 });
 
 const Review = mongoose.model("Review", ReviewScheme);
