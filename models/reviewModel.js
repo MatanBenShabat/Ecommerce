@@ -34,6 +34,8 @@ const ReviewScheme = mongoose.Schema(
   }
 );
 
+ReviewScheme.index({ product: 1, user: 1 }, { unique: true });
+
 ReviewScheme.pre(/^find/, function (next) {
   this.populate({
     path: "user",
@@ -74,7 +76,7 @@ ReviewScheme.statics.calcAverageRatings = async function (productId) {
       ratingsQuantity: stats[0].numRatings,
       rating: stats[0].avgRating,
     });
-  }else{
+  } else {
     await Products.findByIdAndUpdate(productId, {
       ratingsQuantity: 0,
       rating: 5,
