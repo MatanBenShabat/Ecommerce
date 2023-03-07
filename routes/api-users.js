@@ -7,35 +7,34 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router
-  .post("/signup", 
-  SignUpValidation, 
-  authController.signup)
-  .post("/login", 
-  SignInValidation, 
-  authController.login)
+  .post("/signup", SignUpValidation, authController.signup)
+  .post("/login", SignInValidation, authController.login)
   .post("/forgotPassword", authController.forgotPassword)
-  .patch("/resetPassword/:token", authController.resetPassword)
-  
+  .patch("/resetPassword/:token", authController.resetPassword);
 
-  router.use(authController.protect)
-  
-  
-  router
+router.use(authController.protect);
+
+router
   .post("/startApp", authController.startApp)
 
   .post("/logout", authController.logout)
 
   .patch(
-  "/updateMyPassword",
- 
-  authController.updatePassword
-    )
+    "/updateMyPassword",
 
-  .patch("/updateMe", usersController.updateMe)
+    authController.updatePassword
+  )
+
+  .patch(
+    "/updateMe",
+    usersController.uploadImage,
+    usersController.resizeUserImage,
+    usersController.updateMe
+  )
   .patch("/updateRole", usersController.updateRole)
   .delete("/deleteMe", usersController.deleteMe)
 
-  .get("/users",authController.restrictTo("admin"), usersController.getUsers) //Development
+  .get("/users", authController.restrictTo("admin"), usersController.getUsers) //Development
   .delete(
     "/users/?:id",
     authController.restrictTo("admin"),
