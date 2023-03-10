@@ -7,7 +7,7 @@ const AppError = require("../Utils/appError");
 const Users = require("../models/usersModel");
 const catchAsync = require("../Utils/catchAsync");
 const { validate } = require("../models/usersModel");
-const sendEmail = require("../Utils/email");
+const Email = require("../Utils/email");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -69,6 +69,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+
+  const url = "https://house-of-auctions.netlify.app/profile";
+  await new Email(newUser, url).sendWelcome()
+
+
+
   createSendToken(newUser, 201, res);
 });
 
@@ -155,19 +162,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   //3) Send it to user's email
 
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api-users/resetPassword/${resetToken}`;
-
-  const message = `Forgot your password? Submit a patch rquest with your new password and passwordConfirm to: ${resetURL}. \nIf you didn't forget your password, please ignore this email.`;
-
+  const resetURL = `${process.env.SITE_URL}/resetpassword/${resetToken}`;
+  
   try {
-    await sendEmail({
-      email: user.email,
-      subject: "Your password reset token (valid for 10 min)",
-      message,
-      resetToken
-    });
+    
+    await new Email(user, resetURL).sendPasswordReset()
 
     res.status(200).json({
       status: "success",

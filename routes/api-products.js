@@ -33,6 +33,8 @@ router
   .patch(
     "/update-product/:id",
     authController.restrictTo("seller"),
+    productsController.uploadProductImages,
+    productsController.resizeProductImages,
     productsController.updateProduct
   )
   .delete(

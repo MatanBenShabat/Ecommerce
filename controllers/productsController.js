@@ -4,6 +4,71 @@ const AppError = require("../Utils/appError");
 const AuctionTimers = require("../Utils/AuctionTimers");
 const catchAsync = require("../Utils/catchAsync");
 
+const multer = require("multer");
+const sharp = require("sharp");
+
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "public/images/users");
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split("/")[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+//   },
+// });
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Please upload only images!", 400), false);
+  }
+};
+
+const multerStorage = multer.memoryStorage();
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+exports.uploadProductImages = upload.fields([
+  {
+    name: "image",
+    maxCount: 1,
+  },
+  { name: "images", maxCount: 3 },
+]);
+
+exports.resizeProductImages = catchAsync(async (req, res, next) => {
+  if (!req.files.image || !req.files.images) return next();
+
+  // 1) Cover image
+  req.body.image = `product-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  await sharp(req.files.image[0].buffer)
+    .resize(2000, 1333)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`public/images/products/${req.body.image}`);
+
+  // 2) Images
+  req.body.images = [];
+  await Promise.all(
+    req.files.images.map(async (file, index) => {
+      const filename = `product-${req.params.id}-${Date.now()}-${
+        index + 1
+      }.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/images/products/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+  next();
+});
+
 exports.aliasTopProducts = (req, res, next) => {
   req.query.limit = "5";
   req.query.sort = "price";
@@ -79,8 +144,6 @@ exports.createProduct = catchAsync(async (req, res, next) => {
     },
   });
 });
-
-
 
 exports.updateProduct = catchAsync(async (req, res, next) => {
   console.log("here");
@@ -245,8 +308,12 @@ exports.getNameAndBrand = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateProductsIsActiveAndExpiredDate = catchAsync(async (req,res,next) => {
-  await Products.updateMany({isActive: true})
-  await Products.updateMany({endOfAuctionDate: Date.now()+5*24*60*60*1000})
-  next()
-})
+exports.updateProductsIsActiveAndExpiredDate = catchAsync(
+  async (req, res, next) => {
+    await Products.updateMany({ isActive: true });
+    await Products.updateMany({
+      endOfAuctionDate: Date.now() + 5 * 24 * 60 * 60 * 1000,
+    });
+    next();
+  }
+);

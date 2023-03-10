@@ -7,6 +7,7 @@ const ProductsScheme = mongoose.Schema(
       required: [true, "A product must have an image"],
       trim: true,
     },
+    images:[String],
     productsName: {
       type: String,
       unique: [true, "Name already exists"],
